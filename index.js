@@ -20,11 +20,12 @@ let lanes;
 let gameSounds, themeSong;
 let gameOver;
 let isMute = false;
+let activeIndex = 0;
 
 const toggleMute = () => {
     if (isMute) {
         // gameSounds.buck.setVolume(0.5);
-        gameSounds.themeSong.setVolume(0.25);
+        gameSounds.themeSong[activeIndex].setVolume(0.25);
         gameSounds.death.setVolume(0.5);
         // gameSounds.death2.setVolume(0.5);
         gameSounds.hit.setVolume(0.5);
@@ -65,8 +66,6 @@ const firstRun = () => {
     // orbitControl = new THREE.OrbitControls(camera, renderer.domElement); //helper to rotate around in scene
     // orbitControl.addEventListener('change', render);
     // orbitControl.enableZoom = true;
-
-    update();
     gameSounds = new Sound(camera);
 
 }
@@ -99,8 +98,19 @@ const init = () => {
         return lane;
     }).filter(lane => lane.index >= 0);
 
-    if (!isMute)
-        gameSounds.themeSong.setVolume(0.25);
+    update();
+
+    const initBgSong = () => {
+        gameSounds.themeSong[activeIndex].isPlaying = false;
+        const random = parseInt(Math.random() * 10, 10) % musicList.length;
+        gameSounds.themeSong[random].play();
+        gameSounds.themeSong[random].onEnded = () => {
+            initBgSong();
+        };
+        activeIndex = random;
+    }
+
+    initBgSong();
 }
 
 //lights up the scene
@@ -269,7 +279,7 @@ class Fox {
         this.fallAnimation.mixer.addEventListener('finished', () => {
             fox.model.visible = false;
             this.splashes.animate(this.model.position);
-            gameSounds.themeSong.setVolume(0);
+            gameSounds.themeSong[activeIndex].setVolume(0);
             gameSounds.splash.play();
         });
         let anim = this.fallAnimation.mixer.clipAction(clip);
@@ -1001,21 +1011,15 @@ class Sound {
         //     this.buck.setLoop(false);
         //     this.buck.setVolume(0.5);
         // });
-        this.themeSong = new THREE.Audio(listener);
-        const initBackgroundMusic = () => {
-            const random = parseInt(Math.random() * 10, 10) % musicList.length;
-            audioLoader.load(`assets/audio/background/${musicList[random]}`, buffer => {
-                this.themeSong.setBuffer(buffer);
-                this.themeSong.setLoop(true);
-                this.themeSong.setVolume(0.25);
-                this.themeSong.play();
-                this.themeSong.onEnded = () => {
-                    this.themeSong.isPlaying = false;
-                    setTimeout(initBackgroundMusic, 3000);
-                }
-            })
-        }
-        initBackgroundMusic();
+        this.themeSong = [];
+        musicList.forEach(music => {
+            audioLoader.load(`assets/audio/background/${music}`, buffer => {
+                const song = new THREE.Audio(listener);
+                song.setBuffer(buffer);
+                song.setVolume(0.25);
+                this.themeSong.push(song);
+            });
+        });
         this.death = new THREE.Audio(listener);
         audioLoader.load('assets/audio/death.mp3', buffer => {
             this.death.setBuffer(buffer);
@@ -1108,7 +1112,7 @@ const update = () => {
                     if (foxRightEdge > carLeftEdge && foxLeftEdge < carRightEdge && fox.getLane() == lane.index) {
                         if (!gameOver) {
                             fox.squish();
-                            gameSounds.themeSong.setVolume(0);
+                            gameSounds.themeSong[activeIndex].setVolume(0);
                             gameSounds.hit.play();
                             gameOver = true;
                             setTimeout(() => {
@@ -1136,7 +1140,7 @@ const update = () => {
                     if (foxRightEdge > truckLeftEdge && foxLeftEdge < truckRightEdge && fox.getLane() == lane.index) {
                         if (!gameOver) {
                             fox.squish();
-                            gameSounds.themeSong.setVolume(0);
+                            gameSounds.themeSong[activeIndex].setVolume(0);
                             gameSounds.hit.play();
                             gameOver = true;
                             setTimeout(() => {
@@ -1202,7 +1206,7 @@ const update = () => {
                     if (!gameOver) {
                         fox.shred();
                         fox.model.visible = false;
-                        gameSounds.themeSong.setVolume(0);
+                        gameSounds.themeSong[activeIndex].setVolume(0);
                         gameSounds.shred.play();
                         // gameSounds.death2.play();
                         gameOver = true;
