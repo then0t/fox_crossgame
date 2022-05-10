@@ -1,0 +1,55 @@
+﻿<!--(C) 2020 Moses Odhiambo-->
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="shortcut icon" href="zid.png">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <title>Crossy Road</title>
+    <link href="index.css" rel="stylesheet" type="text/css" />
+    <script src="lib/112.1/three.min.js"></script>
+    <script src="lib/112.1/OBJLoader.js"></script>
+    <script src="lib/112.1/MTLLoader.js"></script>
+    <script src="lib/112.1/OrbitControls.min.js"></script>
+    <script src="lib/112.1/BufferGeometryUtils.min.js"></script>
+    <script src="lib/stats/stats.min.js"></script>
+    <script src="lib/sweetalert/sweetalert.min.js"></script>
+</head>
+
+<body onload="firstRun()">
+    <div id="score"></div>
+    <div id="splash">
+        <div id="title">
+            <span>welcome to Foxhop</span><br />
+            <span>A project</span><br />by Fox Finance io.<br />
+        </div>
+        <div id="loading">
+            <div class="main letter">LOADING</div>
+            <div class="period1 letter">.</div>
+            <div class="period2 letter">.</div>
+            <div class="period3 letter">.</div>
+        </div>
+        <div id="instructions">
+            Control the Fox with your arrows on your keyboard<br> or swipe on your screen<br><br> Cross as many roads as possible.
+        </div>
+        <div id="play">
+            <div class="play-button">
+                <button id="play-button" disabled onclick="init()"><span>Start</span></button>
+            </div>
+        </div>
+    </div>
+    <div id="mute-button" onclick="toggleMute()">
+        <span id="mute-button-status" class="material-icons">
+            volume_up
+        </span>
+    </div>
+    <div id="restart-wrap">
+        <button id="restart" onclick="init()">Play Again</button>
+    </div>
+    <script src="index.js"></script>
+</body>
+
+</html>
