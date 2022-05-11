@@ -25,6 +25,7 @@ let activeIndex = 0;
 const toggleMute = () => {
     if (isMute) {
         // gameSounds.buck.setVolume(0.5);
+        console.log(gameSounds.themeSong[activeIndex], activeIndex)
         gameSounds.themeSong[activeIndex].setVolume(0.25);
         gameSounds.death.setVolume(0.5);
         // gameSounds.death2.setVolume(0.5);
@@ -35,7 +36,10 @@ const toggleMute = () => {
         document.getElementById("mute-button-status").innerHTML = "volume_up";
     } else {
         for (let sound in gameSounds) {
-            gameSounds[sound].setVolume(0);
+            if (sound === "themeSong")
+                gameSounds.themeSong[activeIndex].setVolume(0);
+            else
+                gameSounds[sound].setVolume(0);
         }
         isMute = true;
         document.getElementById("mute-button-status").innerHTML = "volume_off";
@@ -101,6 +105,8 @@ const init = () => {
     update();
 
     const initBgSong = () => {
+        if (isMute)
+            return;
         gameSounds.themeSong[activeIndex].isPlaying = false;
         const random = parseInt(Math.random() * 10, 10) % musicList.length;
         gameSounds.themeSong[random].play();
